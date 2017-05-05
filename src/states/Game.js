@@ -17,10 +17,12 @@ export default class extends Phaser.State {
   create () {
     this.game.physics.startSystem(Phaser.Physics.ARCADE)
 
-    this.player = this.game.add.sprite(250, 50, 'player')
+    this.player = this.game.add.sprite(360, 100, 'player')
     this.ground = this.game.add.sprite(760/2-160, 400/2, 'ground')
     this.wall1 = this.game.add.sprite(760/2-160, 400/2-80, 'wall')
     this.wall2 = this.game.add.sprite(760/2+140, 400/2-80, 'wall')
+
+    this.jumpSound = this.game.add.audio('jump', 0.1)
 
     game.physics.arcade.enable(this.player)
     game.physics.arcade.enable(this.ground)
@@ -34,19 +36,30 @@ export default class extends Phaser.State {
     this.player.animations.play('idle')
 
     this.cursor = game.input.keyboard.createCursorKeys()
+    this.hasJumped = false
   }
 
   update () {
     this.game.physics.arcade.collide(this.player, this.ground)
 
     this.inputs()
+
+    if (this.player.body.touching.down && this.player.y > 100) {
+      this.hasJumped = false
+      this.player.body.velocity.y = 0
+    }
   }
 
   inputs () {
-    if (this.cursor.left.isDown) {
-      this.player.body.velocity.x = -100
-      this.player.frame = 2;
-    } else {
+    if (this.cursor.left.isDown || this.moveLeft) {
+      this.player.body.velocity.x = -200
+      this.player.frame = 2
+    }
+    else if (this.cursor.right.isDown || this.moveRight) {
+      this.player.body.velocity.x = 200
+      this.player.frame = 1
+    }
+    else {
       this.player.body.velocity.x = 0
     }
 
