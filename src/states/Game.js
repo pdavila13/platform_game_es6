@@ -9,7 +9,7 @@ export default class extends Phaser.State {
   }
 
   create () {
-    //
+    this.player = game.add.sprite(250, 50, 'player')
   }
 
   render () {
