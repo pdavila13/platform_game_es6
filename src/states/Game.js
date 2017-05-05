@@ -47,6 +47,14 @@ export default class extends Phaser.State {
     } else {
       this.plauer.velocity.x = 0
     }
+
+    if (this.cursor.up.isDown) {
+      this.jumpPlayer()
+    }
+  }
+
+  jumpPlayer () {
+    this.player.body.velocity.y = -220
   }
 
   render () {
