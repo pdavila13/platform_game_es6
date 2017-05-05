@@ -30,10 +30,23 @@ export default class extends Phaser.State {
 
     this.player.animations.add('idle', [3, 4, 5, 4], 5, true)
     this.player.animations.play('idle')
+
+    this.cursor = game.input.keyboard.createCursorKeys()
   }
 
   update () {
     this.game.physics.arcade.collide(this.player, this.ground)
+
+    this.inputs()
+  }
+
+  inputs () {
+    if (this.cursor.left.isDown) {
+      this.player.body.velocity.x = -100
+      this.player.frame = 2;
+    } else {
+      this.plauer.velocity.x = 0
+    }
   }
 
   render () {
