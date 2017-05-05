@@ -26,11 +26,15 @@ export default class extends Phaser.State {
 
     game.physics.arcade.enable(this.player)
     game.physics.arcade.enable(this.ground)
+    game.physics.arcade.enable(this.wall1)
+    game.physics.arcade.enable(this.wall2)
 
     this.player.body.gravity.y = 600
     this.player.body.setSize(20, 20, 0, 0);
 
     this.ground.body.immovable = true
+    this.wall1.body.immovable = true
+    this.wall2.body.immovable = true
 
     this.player.animations.add('idle', [3, 4, 5, 4], 5, true)
     this.player.animations.play('idle')
@@ -41,12 +45,13 @@ export default class extends Phaser.State {
 
   update () {
     this.game.physics.arcade.collide(this.player, this.ground)
+    this.game.physics.arcade.collide(this.player, this.wall1)
+    this.game.physics.arcade.collide(this.player, this.wall2)
 
     this.inputs()
 
-    if (this.player.body.touching.down && this.player.y > 100) {
+    if (this.player.body.touching.down) {
       this.hasJumped = false
-      this.player.body.velocity.y = 0
     }
   }
 
