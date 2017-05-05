@@ -10,15 +10,17 @@ export default class extends Phaser.State {
     this.game.load.spritesheet('player', './assets/images/player.png', 28, 22)
     this.game.load.image('ground', './assets/images/ground.png')
     this.game.load.image('wall', './assets/images/wall.png')
+
+    this.game.load.audio('jump', ['./assets/audio/jump.wav', './assets/audio/jump.mp3'])
   }
 
   create () {
     this.game.physics.startSystem(Phaser.Physics.ARCADE)
-    this.player = this.game.add.sprite(250, 50, 'player')
 
-    this.game.add.sprite(760/2-160, 400/2, 'ground')
-    this.game.add.sprite(760/2-160, 400/2-80, 'wall')
-    this.game.add.sprite(760/2+140, 400/2-80, 'wall')
+    this.player = this.game.add.sprite(250, 50, 'player')
+    this.ground = this.game.add.sprite(760/2-160, 400/2, 'ground')
+    this.wall1 = this.game.add.sprite(760/2-160, 400/2-80, 'wall')
+    this.wall2 = this.game.add.sprite(760/2+140, 400/2-80, 'wall')
 
     game.physics.arcade.enable(this.player)
     game.physics.arcade.enable(this.ground)
@@ -45,7 +47,7 @@ export default class extends Phaser.State {
       this.player.body.velocity.x = -100
       this.player.frame = 2;
     } else {
-      this.plauer.velocity.x = 0
+      this.player.body.velocity.x = 0
     }
 
     if (this.cursor.up.isDown) {
@@ -55,6 +57,11 @@ export default class extends Phaser.State {
 
   jumpPlayer () {
     this.player.body.velocity.y = -220
+
+    if (!this.hasJumped) {
+      this.jumpSound.play()
+      this.hasJumped = true
+    }
   }
 
   render () {
