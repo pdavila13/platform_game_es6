@@ -11,6 +11,8 @@ export default class extends Phaser.State {
     this.game.load.image('ground', './assets/images/ground.png')
     this.game.load.image('wall', './assets/images/wall.png')
 
+    this.game.load.image('enemy', './assets/images/enemy.png')
+
     this.game.load.audio('jump', ['./assets/audio/jump.wav', './assets/audio/jump.mp3'])
   }
 
@@ -18,23 +20,17 @@ export default class extends Phaser.State {
     this.game.physics.startSystem(Phaser.Physics.ARCADE)
 
     this.player = this.game.add.sprite(360, 100, 'player')
-    this.ground = this.game.add.sprite(760/2-160, 400/2, 'ground')
-    this.wall1 = this.game.add.sprite(760/2-160, 400/2-80, 'wall')
-    this.wall2 = this.game.add.sprite(760/2+140, 400/2-80, 'wall')
+    this.enemy = this.game.add.sprite(490, 400/2-20, 'enemy')
 
     this.jumpSound = this.game.add.audio('jump', 0.1)
 
     game.physics.arcade.enable(this.player)
-    game.physics.arcade.enable(this.ground)
-    game.physics.arcade.enable(this.wall1)
-    game.physics.arcade.enable(this.wall2)
+    game.physics.arcade.enable(this.enemy)
+
+    this.loadLevel()
 
     this.player.body.gravity.y = 600
-    this.player.body.setSize(20, 20, 0, 0);
-
-    this.ground.body.immovable = true
-    this.wall1.body.immovable = true
-    this.wall2.body.immovable = true
+    this.player.body.setSize(20, 20, 0, 0)
 
     this.player.animations.add('idle', [3, 4, 5, 4], 5, true)
     this.player.animations.play('idle')
@@ -44,15 +40,26 @@ export default class extends Phaser.State {
   }
 
   update () {
-    this.game.physics.arcade.collide(this.player, this.ground)
-    this.game.physics.arcade.collide(this.player, this.wall1)
-    this.game.physics.arcade.collide(this.player, this.wall2)
+    this.game.physics.arcade.collide(this.player, this.level)
+    this.game.physics.arcade.overlap(this.player, this.enemy)
 
     this.inputs()
 
     if (this.player.body.touching.down) {
       this.hasJumped = false
     }
+  }
+
+  loadLevel () {
+    this.level = this.game.add.group()
+    this.level.enableBody = true
+
+    this.ground = game.add.sprite(760/2-160, 400/2, 'ground', 0, this.level)
+    this.wall1 = game.add.sprite(760/2-160, 400/2-80, 'wall', 0, this.level)
+    this.wall2 = game.add.sprite(760/2+140, 400/2-80, 'wall', 0, this.level)
+
+    this.level.setAll('body.immovable', true)
+    game.physics.arcade.enable(this.level)
   }
 
   inputs () {
