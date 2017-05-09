@@ -12,8 +12,10 @@ export default class extends Phaser.State {
     this.game.load.image('wall', './assets/images/wall.png')
 
     this.game.load.image('enemy', './assets/images/enemy.png')
+    this.game.load.image('coin', './assets/images/coin.png')
 
     this.game.load.audio('jump', ['./assets/audio/jump.wav', './assets/audio/jump.mp3'])
+    this.game.load.audio('coin', ['./assets/audio/coin.wav', './assets/audio/coin.mp3']);
   }
 
   create () {
@@ -23,11 +25,13 @@ export default class extends Phaser.State {
     this.enemy = this.game.add.sprite(490, 400/2-20, 'enemy')
 
     this.jumpSound = this.game.add.audio('jump', 0.1)
+    this.coinSound = this.game.add.audio('coin', 0.1)
 
     game.physics.arcade.enable(this.player)
     game.physics.arcade.enable(this.enemy)
 
     this.loadLevel()
+    this.putCoinsOnLevel()
 
     this.player.body.gravity.y = 600
     this.player.body.setSize(20, 20, 0, 0)
@@ -42,12 +46,30 @@ export default class extends Phaser.State {
   update () {
     this.game.physics.arcade.collide(this.player, this.level)
     this.game.physics.arcade.overlap(this.player, this.enemy)
+    this.game.physics.arcade.overlap(this.player, this.coins, this.takeCoin, null, this)
 
     this.inputs()
 
     if (this.player.body.touching.down) {
       this.hasJumped = false
     }
+  }
+
+  putCoinsOnLevel () {
+    this.coins = game.add.group()
+    this.coins.enableBody = true
+
+    game.add.sprite(260,400/2-20, 'coin', 0, this.coins)
+    game.add.sprite(290,400/2-20, 'coin', 0, this.coins)
+    game.add.sprite(320,400/2-20, 'coin', 0, this.coins)
+
+    game.physics.arcade.enable(this.coins)
+  }
+
+  takeCoin (player, coin) {
+    coin.body.enable = false
+    game.add.tween(coin).to({width:0}, 100).start()
+    this.coinSound.play()
   }
 
   loadLevel () {
