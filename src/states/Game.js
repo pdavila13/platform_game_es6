@@ -15,7 +15,8 @@ export default class extends Phaser.State {
     this.game.load.image('coin', './assets/images/coin.png')
 
     this.game.load.audio('jump', ['./assets/audio/jump.wav', './assets/audio/jump.mp3'])
-    this.game.load.audio('coin', ['./assets/audio/coin.wav', './assets/audio/coin.mp3']);
+    this.game.load.audio('dust', ['./assets/audio/dust.wav', './assets/audio/dust.mp3'])
+    this.game.load.audio('coin', ['./assets/audio/coin.wav', './assets/audio/coin.mp3'])
   }
 
   create () {
@@ -25,12 +26,14 @@ export default class extends Phaser.State {
     this.enemy = this.game.add.sprite(490, 400/2-20, 'enemy')
 
     this.jumpSound = this.game.add.audio('jump', 0.1)
+    this.dustSound = this.game.add.audio('dust', 0.1)
     this.coinSound = this.game.add.audio('coin', 0.1)
 
     game.physics.arcade.enable(this.player)
     game.physics.arcade.enable(this.enemy)
 
     this.loadLevel()
+    this.setParticles()
     this.putCoinsOnLevel()
 
     this.player.body.gravity.y = 600
@@ -50,7 +53,10 @@ export default class extends Phaser.State {
 
     this.inputs()
 
-    if (this.player.body.touching.down) {
+    if (this.player.body.touching.down && this.player.y > 100) {
+      if (this.hasJumped) {
+        this.dustSound.play()
+      }
       this.hasJumped = false
     }
   }
@@ -109,6 +115,20 @@ export default class extends Phaser.State {
       this.jumpSound.play()
       this.hasJumped = true
     }
+  }
+
+  setParticles () {
+    this.dust = this.game.add.emitter(0, 0, 20);
+    this.dust.makeParticles('dust');
+    this.dust.setYSpeed(-100, 100);
+    this.dust.setXSpeed(-100, 100);
+    this.dust.gravity = 0;
+
+    this.exp = this.game.add.emitter(0, 0, 20);
+    this.exp.makeParticles('exp');
+    this.exp.setYSpeed(-150, 150);
+    this.exp.setXSpeed(-150, 150);
+    this.exp.gravity = 0;
   }
 
   render () {
