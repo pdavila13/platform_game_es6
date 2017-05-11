@@ -20,6 +20,8 @@ export default class extends Phaser.State {
     this.game.load.audio('jump', ['./assets/audio/jump.wav', './assets/audio/jump.mp3'])
     this.game.load.audio('dust', ['./assets/audio/dust.wav', './assets/audio/dust.mp3'])
     this.game.load.audio('coin', ['./assets/audio/coin.wav', './assets/audio/coin.mp3'])
+    this.game.load.audio('dead', ['./assets/audio/dead.wav', './assets/audio/dead.mp3'])
+
   }
 
   create () {
@@ -37,6 +39,9 @@ export default class extends Phaser.State {
     this.setParticles()
     this.putCoinsOnLevel()
 
+    this.playerIsDead = false
+    this.spawnPlayer()
+
     this.player.body.gravity.y = 600
     this.player.body.setSize(20, 20, 0, 0)
 
@@ -49,7 +54,7 @@ export default class extends Phaser.State {
 
   update () {
     this.game.physics.arcade.collide(this.player, this.level)
-    this.game.physics.arcade.overlap(this.player, this.enemy)
+    this.game.physics.arcade.overlap(this.player, this.enemy, this.spawnPlayer, null, this)
     this.game.physics.arcade.overlap(this.player, this.coins, this.takeCoin, null, this)
 
     this.inputs()
@@ -80,6 +85,26 @@ export default class extends Phaser.State {
     coin.body.enable = false
     game.add.tween(coin).to({width:0}, 100).start()
     this.coinSound.play()
+  }
+
+  dead () {
+    this.playerIsDead = true
+    this.deadSound.play()
+
+    game.camera.shake(0.05, 500)
+
+    this.exp.x = this.player.x
+    this.exp.y = this.player.y
+    this.exp.start(true, 0 , null, 20)
+
+    this.spawnPlayer()
+  }
+
+  spawnPlayer () {
+    if (this.playerIsDead) {
+      this.deadSound.play()
+    }
+    this.playerIsDead = true
   }
 
   loadLevel () {
@@ -126,6 +151,7 @@ export default class extends Phaser.State {
     this.dustSound = this.game.add.audio('dust', 0.1)
     this.expSound = this.game.add.audio('exp', 0.1)
     this.coinSound = this.game.add.audio('coin', 0.1)
+    this.deadSound = this.game.add.audio('dead', 0.1)
   }
 
   setParticles () {
@@ -133,13 +159,13 @@ export default class extends Phaser.State {
     this.dust.makeParticles('dust')
     this.dust.setYSpeed(-100, 100)
     this.dust.setXSpeed(-100, 100)
-    this.dust.gravity = 0
+    //this.dust.gravity = 0
 
     this.exp = this.game.add.emitter(0, 0, 20)
     this.exp.makeParticles('exp')
     this.exp.setYSpeed(-150, 150)
     this.exp.setXSpeed(-150, 150)
-    this.exp.gravity = 0
+    //this.exp.gravity = 0
   }
 
   render () {
